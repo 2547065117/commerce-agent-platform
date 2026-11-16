@@ -1,0 +1,22 @@
+server:
+  address: ${PORTAL_BIND:127.0.0.1}
+  port: ${PORTAL_PORT:8080}
+  servlet:
+    session:
+      timeout: 30m
+      cookie:
+        http-only: true
+        same-site: lax
+        secure: ${PORTAL_COOKIE_SECURE:false}
+spring:
+  application:
+    name: commerce-agent-portal
+  datasource:
+    url: jdbc:h2:file:./data/portal;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: ${PORTAL_DB_PASSWORD:}
+  jackson:
+    default-property-inclusion: non_null
+portal:
+  agent-url: ${AGENT_SERVICE_URL:http://127.0.0.1:8000}
+  admin-password: ${PORTAL_ADMIN_PASSWORD:}

@@ -149,38 +149,9 @@ def assign_thompson(self, user_id, experiment_id):
 
 ---
 
-## Go版核心亮点讲解
+## Python异步并行调用
 
-### `go/orchestrator/supervisor.go` — goroutine并行
-
-```go
-// Go的并行模型: goroutine + sync.WaitGroup
-var wg sync.WaitGroup
-wg.Add(2)
-
-go func() {
-    defer wg.Done()
-    profileResult = s.profileAgent.Run(params)
-    mu.Lock()
-    agentResults["user_profile"] = profileResult
-    mu.Unlock()
-}()
-
-go func() {
-    defer wg.Done()
-    recResult = s.recAgent.Run(params)
-    mu.Lock()
-    agentResults["product_recall"] = recResult
-    mu.Unlock()
-}()
-
-wg.Wait()  // 等待两个goroutine都完成
-```
-
-**面试对比**: 
-- **Python**: `asyncio.gather()` — 协程,单线程异步
-- **Java**: `CompletableFuture.supplyAsync()` — 线程池
-- **Go**: `goroutine + WaitGroup` — M:N调度,最轻量
+参见 `python/orchestrator/supervisor.py`。通过 `asyncio.gather()` 并发执行画像分析和召回，再合并结果，沿用四个 Agent 的现有实现。
 
 ---
 

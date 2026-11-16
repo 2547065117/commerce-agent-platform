@@ -1,6 +1,6 @@
 ---
 name: 多Agent电商推荐系统
-overview: 构建一个面向面试的企业级多Agent电商推荐与营销系统项目，包含Java/Go/Python三语言实现、配套八股文、简历模板和面试STAR法指南，从零到面试全流程覆盖。
+overview: 构建一个面向面试的企业级多Agent电商推荐与营销系统项目，包含Java/Python实现与Vue运营控制台、配套八股文、简历模板和面试STAR法指南，从零到面试全流程覆盖。
 todos:
   - id: phase1-python-core
     content: "Phase 1: Python核心骨架 - LangGraph + Supervisor + 4 Agent + MiniMax M2.7接入"
@@ -14,8 +14,8 @@ todos:
   - id: phase4-java
     content: "Phase 4: Java版实现 - Spring AI Alibaba + Spring Boot 3"
     status: completed
-  - id: phase5-go
-    content: "Phase 5: Go版实现 - LangChainGo + goroutine并行编排"
+  - id: phase5-python-integration
+    content: "Phase 5: Python服务统一 - 异步编排与Java控制台集成"
     status: completed
   - id: phase6-docs
     content: "Phase 6: 面试全套文档 - 八股文/简历模板/STAR法/代码讲解"
@@ -50,11 +50,10 @@ isProject: false
   - 双Agent推荐（Exploitation + Exploration），Qwen2.5-14B
   - 处理类目公平、卖家覆盖、新品曝光等多目标约束
 
-### 1.2 三大框架对比
+### 1.2 主要框架对比
 
 - **LangGraph（Python，生产首选）**：状态机图架构，原生持久化，human-in-the-loop，适合复杂编排
 - **Spring AI Alibaba（Java，企业首选）**：Tool Calling + Handoffs两种模式，Spring生态无缝集成
-- **go-deepagent / LangChainGo（Go，高并发首选）**：递归多Agent层级，typed state，原生并发
 
 ### 1.3 行业趋势
 
@@ -118,7 +117,7 @@ graph TB
 
 ---
 
-## 三、三语言实现方案
+## 三、Python 与 Java 实现方案
 
 ### 3.1 Python版（推荐入门，代码量最少）
 
@@ -146,17 +145,11 @@ graph TB
   - `service/` - 业务服务层
   - `config/` - MCP服务器配置
 
-### 3.3 Go版（高并发，云原生）
+### 3.3 当前运营控制台
 
-- **框架**：LangChainGo + 自研编排层
-- **LLM**：MiniMax M2.7
-- **存储**：Redis + Milvus + PostgreSQL
-- **亮点**：goroutine并行Agent调用，channel聚合结果
-- **核心模块**：
-  - `agent/` - 四个Agent（接口+实现）
-  - `orchestrator/` - 基于goroutine的并行编排
-  - `handler/` - HTTP Handler
-  - `middleware/` - A/B测试中间件
+- Vue 负责页面，Spring Boot 负责业务、安全与持久化。
+- Python 负责 Agent 编排和模型调用，使用 asyncio.gather 并发执行。
+- 代码入口：`enterprise/` 与 `python/`。
 
 ---
 
@@ -171,7 +164,7 @@ graph TB
 - 基于Redis实现实时用户特征工程（RFM模型+行为序列），特征更新延迟<100ms
 - 集成MiniMax M2.7实现个性化营销文案生成，基于用户画像动态切换Prompt模板
 - 设计流量分桶A/B测试引擎，支持Agent级别策略对比，推荐CTR提升15%
-- 技术栈：Python/LangGraph | Java/Spring AI Alibaba | Go/LangChainGo
+- 技术栈：Python/LangGraph | Java/Spring Boot | Vue
 ```
 
 ### 4.2 STAR法面试话术
@@ -260,12 +253,7 @@ multi-agent-ecommerce/
 │   ├── pom.xml
 │   ├── src/main/java/
 │   └── src/test/java/
-├── go/                       # Go实现
-│   ├── go.mod
-│   ├── cmd/
-│   ├── agent/
-│   ├── orchestrator/
-│   └── handler/
+├── enterprise/               # Spring Boot + Vue运营控制台
 └── docker-compose.yml        # 一键启动（Redis+Milvus+MySQL）
 ```
 
@@ -295,9 +283,9 @@ multi-agent-ecommerce/
 - Spring AI Alibaba重构
 - Spring Boot 3 + WebFlux
 
-**Phase 5 - Go版实现**
-- LangChainGo + goroutine并行
-- 高并发优化
+**Phase 5 - Python服务统一与控制台集成**
+- 复用 Python 异步 Agent 编排
+- Java / Vue 控制台调用 Python 接口
 
 **Phase 6 - 文档与面试材料**
 - 详细代码讲解文档

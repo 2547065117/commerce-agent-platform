@@ -1,0 +1,7 @@
+.tools
+frontend/node_modules
+backend/target
+backend/data
+logs
+*.log
+.env

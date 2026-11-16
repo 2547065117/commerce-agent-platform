@@ -1,10 +1,11 @@
 # 🛒 多Agent电商推荐与营销系统
 
-> **面向小白的企业级 AI Agent 项目** — 从零理解 Multi-Agent 架构，配套三语言代码 + 八股文 + 简历模板 + STAR面试话术，找工作全流程覆盖。
+> **当前维护版本**：Vue 前端 + Java/Spring Boot 业务服务 + Python/FastAPI Agent。推荐功能统一由 `python/` 提供。启动入口见 [运营控制台说明](enterprise/README.md)，语言迁移说明见 [Python 模块对应表](enterprise/docs/python-migration.md)。
+
+> **面向小白的企业级 AI Agent 项目** — 从零理解 Multi-Agent 架构，配套 Python / Java 代码 + 八股文 + 简历模板 + STAR面试话术，找工作全流程覆盖。
 
 [![Python](https://img.shields.io/badge/Python-3.11%2B-blue?logo=python)](python/)
 [![Java](https://img.shields.io/badge/Java-17%2B-orange?logo=java)](java/)
-[![Go](https://img.shields.io/badge/Go-1.22%2B-00ADD8?logo=go)](go/)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 ---
@@ -14,7 +15,7 @@
 1. [这个项目是什么？](#-这个项目是什么)
 2. [系统架构（看图秒懂）](#-系统架构看图秒懂)
 3. [四大核心 Agent 详解](#-四大核心-agent-详解)
-4. [三语言实现对比](#-三语言实现对比)
+4. [Python 与 Java 实现对比](#-python-与-java-实现对比)
 5. [关键代码展示](#-关键代码展示)
 6. [快速上手运行](#-快速上手运行)
 7. [API 接口文档](#-api-接口文档)
@@ -240,15 +241,15 @@ BANNED_WORDS = ["最好", "第一", "最便宜", "绝对", "100%"]
 
 ---
 
-## 🌐 三语言实现对比
+## 🌐 Python 与 Java 实现对比
 
-| 维度 | Python | Java | Go |
-|------|--------|------|----|
-| 框架 | [LangGraph](https://github.com/langchain-ai/langgraph) + FastAPI | [Spring AI Alibaba](https://github.com/alibaba/spring-ai-alibaba) + Spring Boot 3 | LangChainGo + Gin |
-| 并行方式 | `asyncio.gather()` | `CompletableFuture.allOf()` | `goroutine` + `sync.WaitGroup` |
-| 推荐语言 | ✅ 入门首选，代码量最少 | ✅ 企业级Java岗 | ✅ 高并发/云原生岗 |
-| 代码位置 | [`python/`](python/) | [`java/`](java/) | [`go/`](go/) |
-| 启动命令 | `python main.py` | `mvn spring-boot:run` | `go run cmd/main.go` |
+| 维度 | Python | Java |
+|------|--------|------|
+| 框架 | [LangGraph](https://github.com/langchain-ai/langgraph) + FastAPI | [Spring AI Alibaba](https://github.com/alibaba/spring-ai-alibaba) + Spring Boot 3 |
+| 并行方式 | `asyncio.gather()` | `CompletableFuture.allOf()` |
+| 推荐语言 | ✅ 入门首选，代码量最少 | ✅ 企业级Java岗 |
+| 代码位置 | [`python/`](python/) | [`java/`](java/) |
+| 启动命令 | `python main.py` | `mvn spring-boot:run` |
 
 ---
 
@@ -384,31 +385,18 @@ class BaseAgent(ABC):
 
 ---
 
-### Go 版：goroutine 并行（高并发）
+### Python 异步并行调用
 
-**文件**：[`go/orchestrator/supervisor.go`](go/orchestrator/supervisor.go)
+**文件**：[`python/orchestrator/supervisor.py`](python/orchestrator/supervisor.py)
 
-```go
-func (s *Supervisor) Recommend(ctx context.Context, req *model.RecommendRequest) (*model.RecommendResponse, error) {
-    var wg sync.WaitGroup
-    
-    // goroutine 并行：用户画像 + 商品召回
-    wg.Add(2)
-    go func() {
-        defer wg.Done()
-        profile, _ = s.UserProfileAgent.Run(ctx, req.UserID)
-    }()
-    go func() {
-        defer wg.Done()
-        products, _ = s.ProductRecAgent.Run(ctx, req.NumItems*2)
-    }()
-    wg.Wait()  // 等两个 goroutine 都完成
-    
-    // 串行：文案生成
-    copies, _ = s.MarketingCopyAgent.Run(ctx, profile, products)
-    return &model.RecommendResponse{Products: products, Copies: copies}, nil
-}
+```python
+profile_result, rec_result = await asyncio.gather(
+    self.user_profile_agent.run(user_id=request.user_id, context=request.context),
+    self.product_rec_agent.run(user_profile=None, num_items=request.num_items * 2),
+)
 ```
+
+画像分析和商品召回并发执行，再聚合结果，后续进行重排、库存判断与文案生成。
 
 ---
 
@@ -416,7 +404,7 @@ func (s *Supervisor) Recommend(ctx context.Context, req *model.RecommendRequest)
 
 ### 前置条件
 
-- Python 3.11+ / Java 17+ / Go 1.22+（选一个语言即可）
+- Python 3.11+；运营控制台另需 Java 17+（前端开发另需 Node.js）
 - 申请 LLM API Key（推荐 [MiniMax](https://www.minimax.chat/) 或 [阿里通义](https://dashscope.aliyun.com/)，有免费额度）
 
 ---
@@ -478,23 +466,9 @@ curl -X POST http://localhost:8080/api/v1/recommend \
 
 ---
 
-### Go 版
+### 当前运营控制台
 
-```bash
-cd multi-agent-ecommerce-system/go
-
-# 1. 设置环境变量
-export ECOM_LLM_API_KEY=your_api_key_here
-export ECOM_LLM_BASE_URL=https://api.minimax.chat/v1
-
-# 2. 运行
-go run cmd/main.go
-
-# 3. 测试
-curl -X POST http://localhost:8080/api/v1/recommend \
-  -H "Content-Type: application/json" \
-  -d '{"user_id": "user_001", "num_items": 5}'
-```
+当前采用 Vue + Spring Boot + Python。启动和维护说明见 [`enterprise/README.md`](enterprise/README.md)，无需安装其他语言运行时。
 
 ---
 
@@ -522,7 +496,7 @@ docker-compose ps
 
 | 方法 | 路径 | 说明 | 语言 |
 |------|------|------|------|
-| `POST` | `/api/v1/recommend` | 核心推荐接口 | Python / Java / Go |
+| `POST` | `/api/v1/recommend` | 核心推荐接口 | Python / Java |
 | `POST` | `/api/v1/recommend/graph` | LangGraph 状态图推荐 | Python only |
 | `GET` | `/api/v1/experiments` | 查看 A/B 实验状态 | Python / Java |
 | `GET` | `/api/v1/metrics` | 系统监控指标 | Python only |
@@ -627,14 +601,11 @@ multi-agent-ecommerce-system/
 │       ├── config/                    # LLM 配置 + REST Controller
 │       └── model/                     # 数据模型（Request/Response）
 │
-└── go/                                # 🐹 Go 实现（高并发云原生）
-    ├── go.mod                         # 模块依赖
-    ├── cmd/main.go                    # 程序入口
-    ├── agent/                         # 4 个 Agent（interface + impl）
-    ├── orchestrator/supervisor.go     # goroutine + WaitGroup 并行编排
-    ├── handler/api.go                 # Gin HTTP 路由
-    ├── service/ab_test.go             # A/B 测试服务
-    └── model/types.go                 # 数据结构定义
+└── enterprise/                        # Spring Boot + Vue 运营控制台
+    ├── backend/                       # Java 业务服务、安全与持久化
+    ├── frontend/                      # Vue 页面
+    ├── docs/                          # 架构与运行说明
+    └── start-all.ps1                   # 启动 Java + Python 服务
 ```
 
 ---
@@ -808,9 +779,9 @@ multi-agent-ecommerce-system/
 • 设计流量分桶 + Thompson Sampling A/B 测试引擎，支持 Agent/模型/Prompt
   三层实验，推荐 CTR 提升 15%，文案点击率提升 23%
 
-• 提供 Python(LangGraph) / Java(Spring AI Alibaba) / Go(goroutine) 三语言实现
+• 提供 Python(LangGraph) Agent 与 Java / Vue 运营控制台
 
-技术栈：LangGraph · Spring AI Alibaba · Go · Redis · Milvus · FastAPI · Docker
+技术栈：LangGraph · Spring AI Alibaba · Redis · Milvus · FastAPI · Docker
 ```
 
 ---

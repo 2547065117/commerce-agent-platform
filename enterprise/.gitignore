@@ -1,0 +1,9 @@
+node_modules/
+dist/
+target/
+data/
+logs/
+.env
+*.log
+.tools/
+/backend/src/main/resources/static/

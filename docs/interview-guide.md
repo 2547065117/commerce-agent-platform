@@ -17,9 +17,9 @@
   文案合规率100%(广告法敏感词自动过滤)
 • 设计流量分桶+Thompson Sampling A/B测试引擎,支持Agent/模型/Prompt
   三层实验,推荐CTR提升15%
-• 提供Python(LangGraph)/Java(Spring AI)/Go(goroutine)三语言实现
+• 提供Python(LangGraph) Agent 与 Java(Spring Boot)/Vue运营控制台
 
-技术栈: LangGraph · Spring AI · Go · Redis · Milvus · FastAPI · Docker
+技术栈: LangGraph · Spring AI · Redis · Milvus · FastAPI · Docker
 ```
 
 ---
@@ -64,7 +64,7 @@
 > - 推荐CTR提升15%,个性化文案点击率比通用文案高23%
 > - 系统端到端延迟P99 < 2s(4个Agent并行执行)
 > - 库存校验后,推荐缺货商品率从12%降至0.5%
-> - 提供了Python/Java/Go三语言实现,方便不同技术栈的团队使用
+> - 提供了Python/Java实现,方便不同技术栈的团队使用
 
 ---
 
@@ -223,15 +223,15 @@ vs 传统A/B: Thompson Sampling减少50%实验周期,且不影响统计显著性
 选LangGraph的原因: 需要精确控制并行/串行顺序、状态在Agent间传递、
 以及生产级的checkpoint持久化能力。
 
-**Q12: 三语言实现的技术选型对比?**
+**Q12: Python与Java的技术选型对比?**
 
-| 维度 | Python (LangGraph) | Java (Spring AI) | Go (goroutine) |
-|------|-------------------|-----------------|----------------|
-| 并行模型 | asyncio.gather | CompletableFuture | goroutine+WaitGroup |
-| 状态管理 | TypedDict | Spring Bean | struct |
-| 序列化 | Pydantic | Jackson | encoding/json |
-| Web框架 | FastAPI | Spring WebFlux | Gin |
-| 适合场景 | AI团队快速迭代 | 企业级Java生态 | 高并发微服务 |
+| 维度 | Python (LangGraph) | Java (Spring AI) |
+|------|-------------------|-----------------|
+| 并行模型 | asyncio.gather | CompletableFuture |
+| 状态管理 | TypedDict | Spring Bean |
+| 序列化 | Pydantic | Jackson |
+| Web框架 | FastAPI | Spring WebFlux |
+| 适合场景 | AI团队快速迭代 | 企业级Java生态 |
 
 ---
 
@@ -495,10 +495,10 @@ services:
 - Thompson Sampling
 - 指标聚合
 
-### 4. `go/orchestrator/supervisor.go` — Go并行实现
-- goroutine + sync.WaitGroup 并行
-- sync.Mutex 保护共享状态
-- 与Python版的对比(goroutine vs asyncio)
+### 4. `enterprise/backend/` — Java业务层与Python服务集成
+- Spring Security 登录、会话与 CSRF 保护
+- HTTP 调用 Python Agent，区分成功和降级
+- 数据库记录调用结果与审计事件
 
 ---
 
@@ -513,4 +513,4 @@ services:
 - [ ] 能解释实时特征的Redis数据结构选型
 - [ ] 能对比三个多Agent框架(LangGraph/CrewAI/AutoGen)
 - [ ] 跑通Python版demo,能现场演示
-- [ ] 读懂Go版代码,能解释goroutine并行模型
+- [ ] 读懂Python异步编排与Java调用Agent服务的链路

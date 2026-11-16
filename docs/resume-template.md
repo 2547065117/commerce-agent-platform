@@ -17,7 +17,7 @@ XX大学 | 计算机科学与技术 | 本科/硕士 | 20XX-20XX
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 技术栈
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-语言: Python / Java / Go
+语言: Python / Java / JavaScript
 AI框架: LangGraph · LangChain · Spring AI · CrewAI
 大模型: OpenAI API · MiniMax · 通义千问 · Prompt工程
 推荐系统: 协同过滤 · 向量检索(Milvus) · LLM重排
@@ -40,9 +40,9 @@ GitHub: github.com/bcefghj/multi-agent-ecommerce
   Prompt三层实验,推荐CTR提升15%
 • 集成LLM实现个性化营销文案生成,5套Prompt模板覆盖新客/VIP/
   价格敏感等用户分群,广告法合规率100%
-• 提供Python(LangGraph)/Java(Spring AI)/Go(goroutine)三语言实现
+• 提供Python(LangGraph) Agent 与 Java(Spring Boot)/Vue运营控制台
 
-技术栈: LangGraph · Spring AI · Go · Redis · Milvus · FastAPI
+技术栈: LangGraph · Spring AI · Redis · Milvus · FastAPI
 ```
 
 ---
@@ -65,7 +65,7 @@ GitHub: github.com/bcefghj/multi-agent-ecommerce
 • 实验平台: Thompson Sampling A/B引擎,支持三层实验正交,
   实验周期较传统A/B缩短50%,推荐CTR提升15%
 
-• 多语言交付: Python/Java/Go三语言实现+Docker一键部署,
+• 多语言交付: Python/Java实现+Docker一键部署,
   降低跨团队技术栈接入门槛
 ```
 
@@ -97,7 +97,7 @@ GitHub: github.com/bcefghj/multi-agent-ecommerce
 重点: 多路召回、LLM重排、实时特征、A/B测试
 
 ### 后端工程师
-重点: 并行编排(asyncio/CompletableFuture/goroutine)、
+重点: 并行编排(asyncio/CompletableFuture)、
       Redis、微服务、Docker部署
 
 ### 大模型应用工程师
